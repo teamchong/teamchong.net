@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  /* Cloudflare brand */
+  --color-cf-orange: #f38020;
+  --color-cf-orange-light: #faad3f;
+  --color-cf-ink: #0a0a0a;
+}
+
+/* The page has no scrollable content — wheel events still fire (used to
+   control globe rotation) but the browser's elastic overscroll bounce is
+   suppressed by clipping at html/body and disabling overscroll chaining. */
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}

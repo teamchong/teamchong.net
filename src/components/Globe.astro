@@ -22,16 +22,36 @@
 <script>
   import createGlobe from "cobe";
 
+  const supportsWebGL = (): boolean => {
+    try {
+      const c = document.createElement("canvas");
+      return !!(c.getContext("webgl2") || c.getContext("webgl"));
+    } catch {
+      return false;
+    }
+  };
+
   const canvas = document.getElementById("globe") as HTMLCanvasElement | null;
-  if (canvas && typeof window !== "undefined") {
+  if (!canvas || typeof window === "undefined") {
+    // nothing to do
+  } else if (!supportsWebGL()) {
+    // No WebGL (locked-down corporate Mac, ancient browser, etc.) —
+    // hide the canvas and let the CSS radial-gradient fallback show.
+    canvas.style.display = "none";
+    document.documentElement.classList.add("no-webgl");
+  } else {
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-    let cssW = 0;
-    let cssH = 0;
+    // Force square size — guarantees the globe is always circular.
+    // Matches the CSS `min(100vmin, 900px)` rule but bypasses the
+    // bounding-rect measurement bug on iOS Safari where the rect can
+    // briefly return non-square values during URL-bar animation.
+    let cssSize = 0;
     const measure = () => {
-      const rect = canvas.getBoundingClientRect();
-      cssW = Math.max(1, Math.floor(rect.width));
-      cssH = Math.max(1, Math.floor(rect.height));
+      cssSize = Math.max(
+        1,
+        Math.min(window.innerWidth, window.innerHeight, 900),
+      );
     };
     measure();
 
@@ -59,8 +79,8 @@
 
     const globe = createGlobe(canvas, {
       devicePixelRatio: dpr,
-      width: cssW,
-      height: cssH,
+      width: cssSize,
+      height: cssSize,
       phi: 0,
       theta: 0.25,
       dark: 1,
@@ -92,7 +112,7 @@
 
     window.addEventListener("resize", () => {
       measure();
-      globe.update({ width: cssW, height: cssH });
+      globe.update({ width: cssSize, height: cssSize });
     });
 
     let rafId = 0;

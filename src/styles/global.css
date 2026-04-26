@@ -19,3 +19,21 @@ body {
   overflow: hidden;
   overscroll-behavior: none;
 }
+
+/* Fallback when WebGL is unavailable (locked-down corporate browsers,
+   ancient versions, GPU disabled). The Globe canvas sets `.no-webgl` on
+   <html> and we paint a soft Cloudflare-orange radial glow so the page
+   never feels empty. */
+html.no-webgl::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(243, 128, 32, 0.18) 0%,
+    rgba(243, 128, 32, 0.06) 35%,
+    transparent 65%
+  );
+}
